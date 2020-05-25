@@ -1,0 +1,5 @@
+=== systemd
+
+==== timesyncd
+
+NTP is provided by systemd-timesyncd. Ensure it is configured and enabled for all hosts.

@@ -1,0 +1,19 @@
+----
+python -mensurepip --default-pip
+pip install -U pip
+pip install python-openstackclient pymysql httpie
+----
+
+[source,text]
+./etc/systemd/system/uwsgi@.service
+----
+include::openstack/uwsgi@.service[]
+----
+
+=== Services
+
+* link:openstack/keystone.html[keystone]
+* link:openstack/placement.html[placement]
+* link:openstack/glance.html[glance]
+* link:openstack/neutron.html[neutron]
+* link:openstack/nova.html[nova]

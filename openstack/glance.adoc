@@ -1,0 +1,44 @@
+:service: glance
+:port: 9292
+:wsgi: glance-wsgi-api
+:type: image
+:toc:
+
+= {service}
+
+include::database.sql[]
+
+include::pip.sh[]
+
+== Configuration
+
+.https://docs.openstack.org/{service}/latest/configuration[/etc/{service}/{service}-api.conf]
+----
+[database]
+connection = mysql+pymysql://{service}:<password>@_gateway/{service}
+----
+
+./etc/uwsgi.d/{service}.ini
+----
+[uwsgi]
+http-socket = [::]:{port}
+wsgi-file = /usr/bin/{wsgi}
+----
+
+== Installation Commands
+
+----
+openstack service create --name {service} --description "{service} {type} API" {type}
+openstack endpoint create --region RegionOne \
+	{service} public http://controller:{port}
+openstack endpoint create --region RegionOne \
+	{service} internal http://controller:{port}
+openstack endpoint create --region RegionOne \
+	{service} admin http://controller:{port}
+
+ln -s /usr/etc/glance/glance-api-paste.ini /etc/glance
+machinectl shell {service}@.host /usr/bin/{service}-manage db sync
+systemctl enable --now uwsgi@{service}.service
+----
+
+link:placement.html[<-placement] link:../#_services[back] link:neutron.html[neutron ->]

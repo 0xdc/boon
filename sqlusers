@@ -1,0 +1,20 @@
+#!/usr/bin/env ansible-playbook
+- hosts: localhost
+  tasks:
+  - include_role:
+      name: mysql
+    vars:
+      state: absent
+    with_items:
+    - nova-api
+
+  - include_role:
+      name: mysql
+    with_items:
+    - keystone
+    - placement
+    - glance
+    - neutron
+    - nova
+    - nova_api
+    - nova_cell0

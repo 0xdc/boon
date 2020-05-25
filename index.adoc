@@ -1,0 +1,38 @@
+Basic OpenStack on NSpawn
+=========================
+:toc2:
+
+The aim of this document is to guide the installation of a single-node
+(dev/test) core OpenStack environment on Gentoo.
+
+The host system can be any regular systemd-stage3 and will need to
+provide some non-python services and the compute service.
+The OpenStack services, which are written in python, will be installed
+into a systemd-nspawn container which just enough to install and run
+the services.
+
+== Password generation
+
+We need a lot of passwords for each service. While you can generate your own
+passwords, these passwords may be placed into text files with questionable
+parsing abilities, so it is recommended to not use some special characters.
+You can increase entropy by increasing the length of the passwords.
+
+For our purposes, we will use openssl's random hex generator to create passwords.
+
+[source,bash]
+-----
+$ openssl rand -hex 31
+-----
+
+== Host Support Services
+
+include::systemd.adoc[systemd]
+
+include::mysql.adoc[MySQL]
+
+include::rabbitmq.adoc[]
+
+== OpenStack Controller Services
+
+include::openstack.adoc[OpenStack]

@@ -1,0 +1,55 @@
+:service: placement
+:port: 8778
+:wsgi: placement-api
+:type: placement
+:toc:
+
+= {service}
+
+== Database
+On your database server, create the {service} database and user:
+
+----
+CREATE DATABASE {service};
+GRANT ALL PRIVILEGES ON {service}.* TO '{service}'@'%' IDENTIFIED BY '<password>';
+FLUSH PRIVILEGES;
+----
+
+== Package
+Install the {service} package from PyPI:
+
+----
+pip install openstack-{service}
+mkdir -p /etc/{service}
+----
+
+== Configuration
+.https://docs.openstack.org/{service}/latest/configuration/config.html[/etc/{service}/{service}.conf]
+----
+[{service}_database]
+connection = mysql+pymysql://{service}:<password>@_gateway/{service}
+----
+
+./etc/uwsgi.d/{service}.ini
+----
+[uwsgi]
+http-socket = [::]:{port}
+wsgi-file = /usr/bin/{wsgi}
+----
+
+== Installation Commands
+
+----
+openstack service create --name {service} --description "{service} {type} API" {type}
+openstack endpoint create --region RegionOne \
+	{service} public http://controller:8778
+openstack endpoint create --region RegionOne \
+	{service} internal http://controller:8778
+openstack endpoint create --region RegionOne \
+	{service} admin http://controller:8778
+
+machinectl shell {service}@.host /usr/bin/{service}-manage db sync
+systemctl enable --now uwsgi@{service}.service
+----
+
+link:keystone.html[<-keystone] link:../#_services[back] link:glance.html[glance ->]
