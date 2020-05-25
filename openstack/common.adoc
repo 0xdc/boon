@@ -1,0 +1,14 @@
+:toc:
+
+= {service}
+
+include::database.sql[]
+
+include::pip.sh[]
+
+== Configuration
+.https://docs.openstack.org/{service}/latest/configuration[/etc/{service}/{service}.conf]
+----
+[database]
+connection = mysql+pymysql://{service}:<password>@_gateway/{service}
+----

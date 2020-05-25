@@ -1,0 +1,105 @@
+:service: neutron
+:port: 9696
+:wsgi: neutron-api
+:type: network
+:toc:
+
+= {service}
+
+include::database.sql[]
+
+include::pip.sh[]
+
+== Configuration
+.https://docs.openstack.org/{service}/latest/configuration/neutron-conf.html[/etc/{service}/{service}.conf]
+----
+[DEFAULT]
+core_plugin = ml2
+transport_url = rabbit://openstack:<rabbit_password>@controller
+notify_nova_on_port_status_changes = true
+notify_nova_on_port_data_changes = true
+
+[database]
+connection = mysql+pymysql://{service}:<password>@_gateway/{service}
+
+[oslo_concurrency]
+lock_path = /var/lib/neutron/tmp
+
+[keystone_authtoken]
+www_authenticate_uri = http://controller:5000
+auth_url = http://controller:5000
+service_token_roles_required = True
+auth_type = password
+username = {service}
+region_name = RegionOne
+password = <password>
+
+[nova]
+auth_url = http://controller:5000
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = nova
+region_name = RegionOne
+password = <password>
+----
+
+.https://docs.openstack.org/neutron/latest/configuration/ml2-conf.html[/etc/neutron/plugins/ml2/ml2.conf]
+----
+[ml2]
+type_drivers = flat,vlan
+tenant_network_types = 
+mechanism_drivers = linuxbridge
+extension_drivers = port_security
+
+[ml2_type_flat]
+flat_networks = provider
+----
+
+.https://docs.openstack.org/neutron/latest/configuration/linuxbridge-agent.html[/etc/neutron/plugins/ml2/linuxbridge_agent.ini]
+----
+[linux_bridge]
+physical_interface_mappings = provider:PROVIDER_INTERFACE_NAME
+
+[securitygroup]
+enable_security_group = true
+firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+----
+
+.https://docs.openstack.org/neutron/latest/configuration/dhcp-agent.html[/etc/neutron/dhcp_agent.ini]
+----
+[DEFAULT]
+interface_driver = linuxbridge
+dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
+enable_isolated_metadata = true
+----
+
+./etc/uwsgi.d/{service}.ini
+----
+[uwsgi]
+http-socket = [::]:{port}
+wsgi-file = /usr/bin/{wsgi}
+----
+
+== Installation Commands
+
+----
+openstack user create --domain default --password <password> {service}
+openstack role add --project service --user {service} admin
+
+openstack service create --name {service} --description "{service} {type} API" {type}
+openstack endpoint create --region RegionOne \
+	{service} public http://controller:{port}
+openstack endpoint create --region RegionOne \
+	{service} internal http://controller:{port}
+openstack endpoint create --region RegionOne \
+	{service} admin http://controller:{port}
+
+ln -s /usr/etc/{service}/api-paste.ini /etc/{service}
+machinectl shell {service}@.host /usr/bin/{service}-db-manage upgrade heads
+systemctl enable --now uwsgi@{service}.service
+----
+
+
+link:glance.html[<-glance] link:../#_services[back] link:nova.html[nova ->]

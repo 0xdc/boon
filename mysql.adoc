@@ -1,0 +1,12 @@
+=== MySQL
+
+Almost all OpenStack services use a SQL database, so it's a good idea to put
+them all together.
+
+The recommended SQL database is MySQL.
+
+include::mysql/installation.adoc[]
+
+include::mysql/upgrade.adoc[]
+
+include::mysql/create-user.adoc[]

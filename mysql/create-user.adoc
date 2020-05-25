@@ -1,0 +1,16 @@
+==== Creating a user
+
+Creating new MySQL users will be common in this guide. We need to create the
+database for the user, then create the user and assign it permissions on that
+database only.
+
+
+[source,sql]
+----
+CREATE DATABASE database_name;
+GRANT ALL PRIVILEGES ON database_name.* TO 'user_name'@'%' IDENTIFIED BY 'password';
+FLUSH PRIVILEGES;
+----
+
+Replace database_name, user_name and password with your own values. `password`
+can be generated with `openssl rand -hex 31`.

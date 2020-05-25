@@ -1,0 +1,7 @@
+=== RabbitMQ
+
+----
+systemctl enable --now rabbitmq
+machinectl shell rabbitmq@ /usr/libexec/rabbitmq/rabbitmqctl add_user openstack <password>
+machinectl shell rabbitmq@ /usr/libexec/rabbitmq/rabbitmqctl set_permissions openstack ".*" ".*" ".*"
+----

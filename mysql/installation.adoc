@@ -1,0 +1,16 @@
+:server: mariadb
+==== Installation
+
+Run these commands as root:
+
+----
+emerge {server}[server]
+cat >~/.my.cnf <<EOF
+[client]
+user=root
+password=$(openssl rand -hex 31)
+EOF
+emerge --config {server} # this is basically a shortcut to {server}-install-db
+systemctl enable --now {server}
+mysql_secure_installation
+----

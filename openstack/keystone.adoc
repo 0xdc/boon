@@ -1,0 +1,51 @@
+:service: keystone
+:port: 5000
+:wsgi: keystone-wsgi-public
+:type: identity
+:toc:
+
+= {service}
+
+include::database.sql[]
+
+include::pip.sh[]
+
+== Configuration
+.https://docs.openstack.org/{service}/latest/configuration/config.html[/etc/{service}/{service}.conf]
+----
+[database]
+connection = mysql+pymysql://{service}:<password>@_gateway/{service}
+----
+
+[source,yaml]
+./etc/openstack/clouds.yaml
+----
+include::clouds.yaml[]
+----
+
+./etc/uwsgi.d/{service}.ini
+----
+[uwsgi]
+http-socket = [::]:{port}
+wsgi-file = /usr/bin/{wsgi}
+----
+
+== Installation Commands
+
+----
+machinectl shell {service}@.host /usr/bin/{service}-manage db_sync
+{service}-manage fernet_setup --{service}-user {service} --{service}-group {service}
+{service}-manage credential_setup --{service}-user {service} --{service}-group {service}
+
+machinectl shell {service}@.host /usr/bin/{service}-manage bootstrap \
+	--bootstrap-admin-url=http://controller:5000 \
+	--bootstrap-internal-url=http://controller:5000 \
+	--bootstrap-public-url=http://controller:5000 \
+	--bootstrap-region-id RegionOne \
+	--bootstrap-password <admin_password>
+
+systemctl enable --now uwsgi@{service}.service
+openstack project create --domain default --description "OpenStack Services Project" service
+----
+
+link:../#_services[back] link:placement.html[placement ->]

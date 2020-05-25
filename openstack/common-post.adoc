@@ -1,0 +1,24 @@
+
+./etc/uwsgi.d/{service}.ini
+----
+[uwsgi]
+http-socket = [::]:{port}
+wsgi-file = /usr/bin/{wsgi}
+----
+
+----
+openstack user create --domain default --password <password> {service}
+openstack role add --project service --user {service} admin
+
+openstack service create --name {service} --description "{service} {type} API" {type}
+openstack endpoint create --region RegionOne \
+	{service} public http://controller:{port}
+openstack endpoint create --region RegionOne \
+	{service} internal http://controller:{port}
+openstack endpoint create --region RegionOne \
+	{service} admin http://controller:{port}
+
+machinectl shell {service}@.host /usr/bin/{service}-manage db sync
+systemctl enable --now uwsgi@{service}.service
+----
+

@@ -1,0 +1,8 @@
+==== Upgrading
+
+If the MySQL version is ever upgraded, run the command:
+
+[source,bash]
+----
+# mysql_upgrade
+----

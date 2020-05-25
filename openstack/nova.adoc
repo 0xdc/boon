@@ -1,0 +1,64 @@
+:service: nova
+:port: 8774
+:wsgi: nova-api-wsgi
+:type: compute
+:toc:
+
+= {service}
+
+include::database.sql[]
+:service: nova_api
+include::database.sql[]
+:service: nova_cell0
+include::database.sql[]
+:service: nova
+
+include::pip.sh[]
+
+== Configuration
+.https://docs.openstack.org/{service}/latest/configuration[/etc/{service}/{service}.conf]
+----
+[DEFAULT]
+enabled_apis = osapi_compute,metadata
+transport_url = rabbit://openstack:RABBIT_PASS@controller:5672/
+
+[database]
+connection = mysql+pymysql://{service}:<password>@_gateway/{service}
+
+[api_database]
+connection = mysql+pymysql://nova_api:<password>@controller/nova_api
+
+[keystone_authtoken]
+service_token_roles_required = True
+www_authenticate_uri = http://controller:5000
+----
+
+./etc/uwsgi.d/{service}.ini
+----
+[uwsgi]
+http-socket = [::]:{port}
+wsgi-file = /usr/bin/{wsgi}
+----
+
+== Installation Commands
+
+----
+openstack user create --domain default --password <password> {service}
+openstack role add --project service --user {service} admin
+
+openstack service create --name {service} --description "{service} {type} API" {type}
+openstack endpoint create --region RegionOne \
+	{service} public http://controller:{port}
+openstack endpoint create --region RegionOne \
+	{service} internal http://controller:{port}
+openstack endpoint create --region RegionOne \
+	{service} admin http://controller:{port}
+
+ln -s /usr/etc/nova/api-paste.ini /etc/nova
+machinectl shell {service}@.host /usr/bin/{service}-manage api_db sync
+machinectl shell {service}@.host /usr/bin/{service}-manage cell_v2 map_cell0 --database_connection mysql+pymysql://nova_cell0:<password>@_gateway/nova_cell0
+machinectl shell {service}@.host /usr/bin/{service}-manage db sync
+systemctl enable --now uwsgi@{service}.service
+----
+
+link:neutron.html[<- neutron] link:../#_services[back]
