@@ -942,7 +942,7 @@ can be generated with <code>openssl rand -hex 31</code>.</p></div>
 Description=OpenStack %I API Service
 
 [Service]
-ExecStart=/usr/bin/uwsgi_python37 --die-on-term --enable-threads --master --thunder-lock /etc/uwsgi.d/%I.ini
+ExecStart=/usr/bin/uwsgi_python38 --die-on-term --enable-threads --master --thunder-lock /etc/uwsgi.d/%I.ini
 User=%I
 Group=%I
 WorkingDirectory=/etc/%I
@@ -989,7 +989,7 @@ WantedBy=multi-user.target
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-05-24 11:06:53 UTC
+ 2021-03-02 15:22:40 UTC
 </div>
 </div>
 </body>
