@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.10" />
+<meta name="generator" content="AsciiDoc 9.1.0" />
 <title>Basic OpenStack on NSpawn</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -887,8 +887,8 @@ them all together.</p></div>
 <span class="k">user</span><span class="o">=</span><span class="n">root</span><span class="w"></span>
 <span class="n">password</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="n">openssl</span><span class="w"> </span><span class="nf">rand</span><span class="w"> </span><span class="o">-</span><span class="n">hex</span><span class="w"> </span><span class="mi">31</span><span class="p">)</span><span class="w"></span>
 <span class="n">EOF</span><span class="w"></span>
-<span class="n">emerge</span><span class="w"> </span><span class="c1">--config mariadb # this is basically a shortcut to mariadb-install-db</span>
-<span class="n">systemctl</span><span class="w"> </span><span class="n">enable</span><span class="w"> </span><span class="c1">--now mariadb</span>
+<span class="n">emerge</span><span class="w"> </span><span class="o">--</span><span class="n">config</span><span class="w"> </span><span class="n">mariadb</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">basically</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">shortcut</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">mariadb</span><span class="o">-</span><span class="n">install</span><span class="o">-</span><span class="n">db</span><span class="w"></span>
+<span class="n">systemctl</span><span class="w"> </span><span class="n">enable</span><span class="w"> </span><span class="o">--</span><span class="n">now</span><span class="w"> </span><span class="n">mariadb</span><span class="w"></span>
 <span class="n">mysql_secure_installation</span><span class="w"></span>
 </pre></div></code></pre>
 </div></div>
@@ -906,9 +906,9 @@ them all together.</p></div>
 database for the user, then create the user and assign it permissions on that
 database only.</p></div>
 <div class="listingblock">
-<div class="content"><div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">database_name</span><span class="p">;</span>
-<span class="k">GRANT</span> <span class="k">ALL</span> <span class="k">PRIVILEGES</span> <span class="k">ON</span> <span class="n">database_name</span><span class="p">.</span><span class="o">*</span> <span class="k">TO</span> <span class="s1">&#39;user_name&#39;</span><span class="o">@</span><span class="s1">&#39;%&#39;</span> <span class="n">IDENTIFIED</span> <span class="k">BY</span> <span class="s1">&#39;password&#39;</span><span class="p">;</span>
-<span class="n">FLUSH</span> <span class="k">PRIVILEGES</span><span class="p">;</span>
+<div class="content"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">database_name</span><span class="p">;</span><span class="w"></span>
+<span class="k">GRANT</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">database_name</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;user_name&#39;</span><span class="o">@</span><span class="s1">&#39;%&#39;</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;password&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">FLUSH</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="p">;</span><span class="w"></span>
 </pre></div></div></div>
 <div class="paragraph"><p>Replace database_name, user_name and password with your own values. <code>password</code>
 can be generated with <code>openssl rand -hex 31</code>.</p></div>
@@ -918,9 +918,9 @@ can be generated with <code>openssl rand -hex 31</code>.</p></div>
 <h3 id="_rabbitmq">RabbitMQ</h3>
 <div class="listingblock">
 <div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="err">systemctl enable --now rabbitmq</span>
-<span class="err">machinectl shell rabbitmq@ /usr/libexec/rabbitmq/rabbitmqctl add_user openstack &lt;password&gt;</span>
-<span class="err">machinectl shell rabbitmq@ /usr/libexec/rabbitmq/rabbitmqctl set_permissions openstack &quot;.*&quot; &quot;.*&quot; &quot;.*&quot;</span>
+<pre><code><div class="highlight"><pre><span></span>systemctl enable --now rabbitmq
+machinectl shell rabbitmq@ /usr/libexec/rabbitmq/rabbitmqctl add_user openstack &lt;password&gt;
+machinectl shell rabbitmq@ /usr/libexec/rabbitmq/rabbitmqctl set_permissions openstack &quot;.*&quot; &quot;.*&quot; &quot;.*&quot;
 </pre></div></code></pre>
 </div></div>
 </div>
@@ -931,9 +931,9 @@ can be generated with <code>openssl rand -hex 31</code>.</p></div>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="err">python -mensurepip --default-pip</span>
-<span class="err">pip install -U pip</span>
-<span class="err">pip install python-openstackclient pymysql httpie</span>
+<pre><code><div class="highlight"><pre><span></span>python -mensurepip --default-pip
+pip install -U pip
+pip install python-openstackclient pymysql httpie
 </pre></div></code></pre>
 </div></div>
 <div class="listingblock">
@@ -942,7 +942,7 @@ can be generated with <code>openssl rand -hex 31</code>.</p></div>
 Description=OpenStack %I API Service
 
 [Service]
-ExecStart=/usr/bin/uwsgi_python38 --die-on-term --enable-threads --master --thunder-lock /etc/uwsgi.d/%I.ini
+ExecStart=/usr/bin/uwsgi_python310 --die-on-term --enable-threads --master --thunder-lock /etc/uwsgi.d/%I.ini
 User=%I
 Group=%I
 WorkingDirectory=/etc/%I
@@ -989,7 +989,7 @@ WantedBy=multi-user.target
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-03-02 15:22:40 UTC
+ 2021-04-07 13:40:33 UTC
 </div>
 </div>
 </body>
