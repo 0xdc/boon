@@ -22,6 +22,9 @@ connection = mysql+pymysql://{service}:<password>@_gateway/{service}
 ----
 include::clouds.yaml[]
 ----
+.Region Names
+NOTE: In practice, use a UUID for the region name, instead of RegionOne;
+      here and in the bootstrap command below.
 
 ./etc/uwsgi.d/{service}.ini
 ----

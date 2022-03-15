@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.10" />
+<meta name="generator" content="AsciiDoc 9.1.0" />
 <title>keystone</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -809,9 +809,9 @@ asciidoc.install(2);
 <div class="paragraph"><p>On your database server, create the keystone database and user:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="err">CREATE DATABASE keystone;</span>
-<span class="err">GRANT ALL PRIVILEGES ON keystone.* TO &#39;keystone&#39;@&#39;%&#39; IDENTIFIED BY &#39;&lt;password&gt;&#39;;</span>
-<span class="err">FLUSH PRIVILEGES;</span>
+<pre><code><div class="highlight"><pre><span></span>CREATE DATABASE keystone;
+GRANT ALL PRIVILEGES ON keystone.* TO &#39;keystone&#39;@&#39;%&#39; IDENTIFIED BY &#39;&lt;password&gt;&#39;;
+FLUSH PRIVILEGES;
 </pre></div></code></pre>
 </div></div>
 </div>
@@ -822,8 +822,8 @@ asciidoc.install(2);
 <div class="paragraph"><p>Install the keystone package from PyPi:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="err">pip install keystone</span>
-<span class="err">mkdir -p /etc/keystone</span>
+<pre><code><div class="highlight"><pre><span></span>pip install keystone
+mkdir -p /etc/keystone
 </pre></div></code></pre>
 </div></div>
 </div>
@@ -834,28 +834,38 @@ asciidoc.install(2);
 <div class="listingblock">
 <div class="title"><a href="https://docs.openstack.org/keystone/latest/configuration/config.html">/etc/keystone/keystone.conf</a></div>
 <div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="k">[database]</span>
-<span class="na">connection</span> <span class="o">=</span> <span class="s">mysql+pymysql://keystone:&lt;password&gt;@_gateway/keystone</span>
+<pre><code><div class="highlight"><pre><span></span><span class="k">[database]</span><span class="w"></span>
+<span class="na">connection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">mysql+pymysql://keystone:&lt;password&gt;@_gateway/keystone</span><span class="w"></span>
 </pre></div></code></pre>
 </div></div>
 <div class="listingblock">
 <div class="title">/etc/openstack/clouds.yaml</div>
-<div class="content"><div class="highlight"><pre><span></span><span class="nt">clouds</span><span class="p">:</span>
-  <span class="nt">admin</span><span class="p">:</span>
-    <span class="nt">auth</span><span class="p">:</span>
-      <span class="nt">auth_url</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://controller:5000</span>
-      <span class="nt">username</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">admin</span>
-      <span class="nt">password</span><span class="p">:</span>
-      <span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">admin</span>
-    <span class="nt">identity_api_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
-    <span class="nt">region_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RegionOne</span>
+<div class="content"><div class="highlight"><pre><span></span><span class="nt">clouds</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">admin</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">auth</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">auth_url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://controller:5000</span><span class="w"></span>
+<span class="w">      </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
+<span class="w">      </span><span class="nt">password</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
+<span class="w">    </span><span class="nt">identity_api_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
+<span class="w">    </span><span class="nt">region_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RegionOne</span><span class="w"></span>
 </pre></div></div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="title">Region Names</div>In practice, use a UUID for the region name, instead of RegionOne;
+      here and in the bootstrap command below.</td>
+</tr></table>
+</div>
 <div class="listingblock">
 <div class="title">/etc/uwsgi.d/keystone.ini</div>
 <div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="k">[uwsgi]</span>
-<span class="na">http-socket</span> <span class="o">=</span> <span class="s">[::]:5000</span>
-<span class="na">wsgi-file</span> <span class="o">=</span> <span class="s">/usr/bin/keystone-wsgi-public</span>
+<pre><code><div class="highlight"><pre><span></span><span class="k">[uwsgi]</span><span class="w"></span>
+<span class="na">http-socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[::]:5000</span><span class="w"></span>
+<span class="na">wsgi-file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/usr/bin/keystone-wsgi-public</span><span class="w"></span>
 </pre></div></code></pre>
 </div></div>
 </div>
@@ -866,17 +876,17 @@ asciidoc.install(2);
 <div class="listingblock">
 <div class="content">
 <pre><code><div class="highlight"><pre><span></span><span class="n">machinectl</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="n">keystone</span><span class="err">@</span><span class="p">.</span><span class="k">host</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">keystone</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">db_sync</span><span class="w"></span>
-<span class="n">keystone</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">fernet_setup</span><span class="w"> </span><span class="c1">--keystone-user keystone --keystone-group keystone</span>
-<span class="n">keystone</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">credential_setup</span><span class="w"> </span><span class="c1">--keystone-user keystone --keystone-group keystone</span>
+<span class="n">keystone</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">fernet_setup</span><span class="w"> </span><span class="o">--</span><span class="n">keystone</span><span class="o">-</span><span class="k">user</span><span class="w"> </span><span class="n">keystone</span><span class="w"> </span><span class="o">--</span><span class="n">keystone</span><span class="o">-</span><span class="k">group</span><span class="w"> </span><span class="n">keystone</span><span class="w"></span>
+<span class="n">keystone</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">credential_setup</span><span class="w"> </span><span class="o">--</span><span class="n">keystone</span><span class="o">-</span><span class="k">user</span><span class="w"> </span><span class="n">keystone</span><span class="w"> </span><span class="o">--</span><span class="n">keystone</span><span class="o">-</span><span class="k">group</span><span class="w"> </span><span class="n">keystone</span><span class="w"></span>
 
 <span class="n">machinectl</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="n">keystone</span><span class="err">@</span><span class="p">.</span><span class="k">host</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">keystone</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">bootstrap</span><span class="w"> </span><span class="err">\</span><span class="w"></span>
-<span class="w">        </span><span class="c1">--bootstrap-admin-url=http://controller:5000 \</span>
-<span class="w">        </span><span class="c1">--bootstrap-internal-url=http://controller:5000 \</span>
-<span class="w">        </span><span class="c1">--bootstrap-public-url=http://controller:5000 \</span>
-<span class="w">        </span><span class="c1">--bootstrap-region-id RegionOne \</span>
-<span class="w">        </span><span class="c1">--bootstrap-password &lt;admin_password&gt;</span>
+<span class="w">        </span><span class="o">--</span><span class="n">bootstrap</span><span class="o">-</span><span class="k">admin</span><span class="o">-</span><span class="n">url</span><span class="o">=</span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="nl">controller</span><span class="p">:</span><span class="mi">5000</span><span class="w"> </span><span class="err">\</span><span class="w"></span>
+<span class="w">        </span><span class="o">--</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">internal</span><span class="o">-</span><span class="n">url</span><span class="o">=</span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="nl">controller</span><span class="p">:</span><span class="mi">5000</span><span class="w"> </span><span class="err">\</span><span class="w"></span>
+<span class="w">        </span><span class="o">--</span><span class="n">bootstrap</span><span class="o">-</span><span class="k">public</span><span class="o">-</span><span class="n">url</span><span class="o">=</span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="nl">controller</span><span class="p">:</span><span class="mi">5000</span><span class="w"> </span><span class="err">\</span><span class="w"></span>
+<span class="w">        </span><span class="o">--</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">region</span><span class="o">-</span><span class="n">id</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="err">\</span><span class="w"></span>
+<span class="w">        </span><span class="o">--</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">password</span><span class="w"> </span><span class="o">&lt;</span><span class="n">admin_password</span><span class="o">&gt;</span><span class="w"></span>
 
-<span class="n">systemctl</span><span class="w"> </span><span class="n">enable</span><span class="w"> </span><span class="c1">--now uwsgi@keystone.service</span>
+<span class="n">systemctl</span><span class="w"> </span><span class="n">enable</span><span class="w"> </span><span class="o">--</span><span class="n">now</span><span class="w"> </span><span class="n">uwsgi</span><span class="nv">@keystone</span><span class="p">.</span><span class="n">service</span><span class="w"></span>
 <span class="n">openstack</span><span class="w"> </span><span class="n">project</span><span class="w"> </span><span class="k">create</span><span class="w"> </span><span class="c1">--domain default --description &quot;OpenStack Services Project&quot; service</span>
 </pre></div></code></pre>
 </div></div>
@@ -888,7 +898,7 @@ asciidoc.install(2);
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-05-25 08:16:44 UTC
+ 2022-03-15 10:03:11 UTC
 </div>
 </div>
 </body>
