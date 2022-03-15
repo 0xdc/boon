@@ -1,7 +1,9 @@
-- mysql_db:
+- name: "database: {{ item }}"
+  mysql_db:
     name: "{{ item }}"
     state: "{{ state | default('present')}}"
-- mysql_user:
+- name: "user: {{ item }}"
+  mysql_user:
     name: "{{ item }}"
     host: "%"
     password: "{{ lookup('password', '.credentials/' + item + '/mysql') }}"
