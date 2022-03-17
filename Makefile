@@ -5,7 +5,8 @@ services = \
 	   openstack/placement.html \
 	   openstack/glance.html \
 	   openstack/neutron.html \
-	   openstack/nova.html
+	   openstack/nova.html \
+	   openstack/ceph-radosgw.html
 
 
 .PHONY: all

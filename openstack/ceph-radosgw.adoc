@@ -1,0 +1,38 @@
+= Ceph/Rados Gateway
+
+Ceph's RADOS gateway provides a Swift-compatible Object Storage system that can integrate
+with Keystone's identity and authorisation functions. You can send OpenStack authentication
+tokens to radosgw and ceph will check with the keystone server if they are valid.
+
+== Configure Keystone
+
+----
+openstack service create --name=radosgw \
+	--description="Swift Service" \
+	object-store
+
+openstack endpoint create --region RegionOne swift public http://radosgw:8080/swift/v1
+openstack endpoint create --region RegionOne swift admin http://radosgw:8080/swift/v1
+openstack endpoint create --region RegionOne swift internal http://radosgw:8080/swift/v1
+
+openstack user create ceph-radosgw --password <password>
+openstack role add --project service --user ceph-radosgw admin
+----
+
+
+== Configure radosgw
+
+./etc/ceph/ceph.conf
+[source,ini]
+----
+[client.radosgw]
+
+  rgw keystone url = http://controller:5000
+  rgw keystone api version = 3
+  rgw keystone admin user = ceph-radosgw
+  rgw keystone admin password = <password>
+  rgw keystone admin domain = default
+  rgw keystone admin project = service
+----
+
+link:nova.html[<- nova] link:../#_services[back]

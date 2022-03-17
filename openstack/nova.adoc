@@ -61,4 +61,4 @@ machinectl shell {service}@.host /usr/bin/{service}-manage db sync
 systemctl enable --now uwsgi@{service}.service
 ----
 
-link:neutron.html[<- neutron] link:../#_services[back]
+link:neutron.html[<- neutron] link:../#_services[back] link:ceph-radosgw.html[radosgw]

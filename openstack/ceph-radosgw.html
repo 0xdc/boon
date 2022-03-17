@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 9.1.0" />
-<title>nova</title>
+<title>Ceph/Rados Gateway</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -790,125 +790,56 @@ install: function(toclevels) {
 }
 
 }
-asciidoc.install(2);
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
 <body class="article">
 <div id="header">
-<h1>nova</h1>
-<div id="toc">
-  <div id="toctitle">Table of Contents</div>
-  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
-</div>
+<h1>Ceph/Rados Gateway</h1>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_database">Database</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>On your database server, create the nova database and user:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code><div class="highlight"><pre><span></span>CREATE DATABASE nova;
-GRANT ALL PRIVILEGES ON nova.* TO &#39;nova&#39;@&#39;%&#39; IDENTIFIED BY &#39;&lt;password&gt;&#39;;
-FLUSH PRIVILEGES;
-</pre></div></code></pre>
-</div></div>
+<div class="paragraph"><p>Ceph&#8217;s RADOS gateway provides a Swift-compatible Object Storage system that can integrate
+with Keystone&#8217;s identity and authorisation functions. You can send OpenStack authentication
+tokens to radosgw and ceph will check with the keystone server if they are valid.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_database_2">Database</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>On your database server, create the nova_api database and user:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code><div class="highlight"><pre><span></span>CREATE DATABASE nova_api;
-GRANT ALL PRIVILEGES ON nova_api.* TO &#39;nova_api&#39;@&#39;%&#39; IDENTIFIED BY &#39;&lt;password&gt;&#39;;
-FLUSH PRIVILEGES;
-</pre></div></code></pre>
-</div></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_database_3">Database</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>On your database server, create the nova_cell0 database and user:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code><div class="highlight"><pre><span></span>CREATE DATABASE nova_cell0;
-GRANT ALL PRIVILEGES ON nova_cell0.* TO &#39;nova_cell0&#39;@&#39;%&#39; IDENTIFIED BY &#39;&lt;password&gt;&#39;;
-FLUSH PRIVILEGES;
-</pre></div></code></pre>
-</div></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_package">Package</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Install the nova package from PyPi:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code><div class="highlight"><pre><span></span>pip install nova
-mkdir -p /etc/nova
-</pre></div></code></pre>
-</div></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_configuration">Configuration</h2>
+<h2 id="_configure_keystone">Configure Keystone</h2>
 <div class="sectionbody">
 <div class="listingblock">
-<div class="title"><a href="https://docs.openstack.org/nova/latest/configuration">/etc/nova/nova.conf</a></div>
 <div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span><span class="w"></span>
-<span class="na">enabled_apis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">osapi_compute,metadata</span><span class="w"></span>
-<span class="na">transport_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rabbit://openstack:RABBIT_PASS@controller:5672/</span><span class="w"></span>
+<pre><code><div class="highlight"><pre><span></span><span class="n">openstack</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">name</span><span class="o">=</span><span class="n">radosgw</span><span class="w"> </span><span class="se">\</span><span class="w"></span>
+<span class="w">        </span><span class="o">--</span><span class="n">description</span><span class="o">=</span><span class="s">&quot;Swift Service&quot;</span><span class="w"> </span><span class="se">\</span><span class="w"></span>
+<span class="w">        </span><span class="n">object</span><span class="o">-</span><span class="n">store</span><span class="w"></span>
 
-<span class="k">[database]</span><span class="w"></span>
-<span class="na">connection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">mysql+pymysql://nova:&lt;password&gt;@_gateway/nova</span><span class="w"></span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">swift</span><span class="w"> </span><span class="n">public</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">swift</span><span class="w"> </span><span class="n">admin</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">swift</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
 
-<span class="k">[api_database]</span><span class="w"></span>
-<span class="na">connection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">mysql+pymysql://nova_api:&lt;password&gt;@controller/nova_api</span><span class="w"></span>
-
-<span class="k">[keystone_authtoken]</span><span class="w"></span>
-<span class="na">service_token_roles_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
-<span class="na">www_authenticate_uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">http://controller:5000</span><span class="w"></span>
-</pre></div></code></pre>
-</div></div>
-<div class="listingblock">
-<div class="title">/etc/uwsgi.d/nova.ini</div>
-<div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="k">[uwsgi]</span><span class="w"></span>
-<span class="na">http-socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[::]:8774</span><span class="w"></span>
-<span class="na">wsgi-file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/usr/bin/nova-api-wsgi</span><span class="w"></span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="n">ceph</span><span class="o">-</span><span class="n">radosgw</span><span class="w"> </span><span class="o">--</span><span class="n">password</span><span class="w"> </span><span class="o">&lt;</span><span class="n">password</span><span class="o">&gt;</span><span class="w"></span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">role</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="o">--</span><span class="n">project</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="o">--</span><span class="n">user</span><span class="w"> </span><span class="n">ceph</span><span class="o">-</span><span class="n">radosgw</span><span class="w"> </span><span class="n">admin</span><span class="w"></span>
 </pre></div></code></pre>
 </div></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_installation_commands">Installation Commands</h2>
+<h2 id="_configure_radosgw">Configure radosgw</h2>
 <div class="sectionbody">
 <div class="listingblock">
-<div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="n">openstack</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">create</span><span class="w"> </span><span class="o">--</span><span class="k">domain</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="o">--</span><span class="n">password</span><span class="w"> </span><span class="o">&lt;</span><span class="n">password</span><span class="o">&gt;</span><span class="w"> </span><span class="n">nova</span><span class="w"></span>
-<span class="n">openstack</span><span class="w"> </span><span class="k">role</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="o">--</span><span class="n">project</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="o">--</span><span class="k">user</span><span class="w"> </span><span class="n">nova</span><span class="w"> </span><span class="k">admin</span><span class="w"></span>
+<div class="title">/etc/ceph/ceph.conf</div>
+<div class="content"><div class="highlight"><pre><span></span><span class="k">[client.radosgw]</span><span class="w"></span>
 
-<span class="n">openstack</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="k">create</span><span class="w"> </span><span class="o">--</span><span class="n">name</span><span class="w"> </span><span class="n">nova</span><span class="w"> </span><span class="o">--</span><span class="n">description</span><span class="w"> </span><span class="ss">&quot;nova compute API&quot;</span><span class="w"> </span><span class="k">compute</span><span class="w"></span>
-<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="k">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="err">\</span><span class="w"></span>
-<span class="w">        </span><span class="n">nova</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="nl">controller</span><span class="p">:</span><span class="mi">8774</span><span class="w"></span>
-<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="k">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="err">\</span><span class="w"></span>
-<span class="w">        </span><span class="n">nova</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="nl">controller</span><span class="p">:</span><span class="mi">8774</span><span class="w"></span>
-<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="k">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="err">\</span><span class="w"></span>
-<span class="w">        </span><span class="n">nova</span><span class="w"> </span><span class="k">admin</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="nl">controller</span><span class="p">:</span><span class="mi">8774</span><span class="w"></span>
-
-<span class="k">ln</span><span class="w"> </span><span class="o">-</span><span class="n">s</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nova</span><span class="o">/</span><span class="n">api</span><span class="o">-</span><span class="n">paste</span><span class="p">.</span><span class="n">ini</span><span class="w"> </span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nova</span><span class="w"></span>
-<span class="n">machinectl</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="n">nova</span><span class="err">@</span><span class="p">.</span><span class="k">host</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">nova</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">api_db</span><span class="w"> </span><span class="n">sync</span><span class="w"></span>
-<span class="n">machinectl</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="n">nova</span><span class="err">@</span><span class="p">.</span><span class="k">host</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">nova</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">cell_v2</span><span class="w"> </span><span class="n">map_cell0</span><span class="w"> </span><span class="o">--</span><span class="n">database_connection</span><span class="w"> </span><span class="n">mysql</span><span class="o">+</span><span class="nl">pymysql</span><span class="p">:</span><span class="o">//</span><span class="nl">nova_cell0</span><span class="p">:</span><span class="o">&lt;</span><span class="n">password</span><span class="o">&gt;</span><span class="nv">@_gateway</span><span class="o">/</span><span class="n">nova_cell0</span><span class="w"></span>
-<span class="n">machinectl</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="n">nova</span><span class="err">@</span><span class="p">.</span><span class="k">host</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">nova</span><span class="o">-</span><span class="n">manage</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="n">sync</span><span class="w"></span>
-<span class="n">systemctl</span><span class="w"> </span><span class="n">enable</span><span class="w"> </span><span class="c1">--now uwsgi@nova.service</span>
-</pre></div></code></pre>
-</div></div>
-<div class="paragraph"><p><a href="neutron.html">&#8592; neutron</a> <a href="../#_services">back</a> <a href="ceph-radosgw.html">radosgw</a></p></div>
+<span class="w">  </span><span class="na">rgw keystone url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">http://controller:5000</span><span class="w"></span>
+<span class="w">  </span><span class="na">rgw keystone api version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">3</span><span class="w"></span>
+<span class="w">  </span><span class="na">rgw keystone admin user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ceph-radosgw</span><span class="w"></span>
+<span class="w">  </span><span class="na">rgw keystone admin password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;password&gt;</span><span class="w"></span>
+<span class="w">  </span><span class="na">rgw keystone admin domain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">default</span><span class="w"></span>
+<span class="w">  </span><span class="na">rgw keystone admin project</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">service</span><span class="w"></span>
+</pre></div></div></div>
+<div class="paragraph"><p><a href="nova.html">&#8592; nova</a> <a href="../#_services">back</a></p></div>
 </div>
 </div>
 </div>
@@ -916,7 +847,7 @@ mkdir -p /etc/nova
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-03-17 18:05:55 UTC
+ 2022-03-17 18:15:16 UTC
 </div>
 </div>
 </body>
