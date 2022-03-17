@@ -35,6 +35,9 @@ wsgi-file = /usr/bin/{wsgi}
 
 == Installation Commands
 
+.db_sync can't find libgcc_s.so.1 shared object?
+NOTE: Merge the contents of `/etc/ld.so.conf.d/*` into `/etc/ld.so.conf` and run `ldconfig`.
+
 ----
 machinectl shell {service}@.host /usr/bin/{service}-manage db_sync
 {service}-manage fernet_setup --{service}-user {service} --{service}-group {service}
@@ -48,6 +51,7 @@ machinectl shell {service}@.host /usr/bin/{service}-manage bootstrap \
 	--bootstrap-password <admin_password>
 
 systemctl enable --now uwsgi@{service}.service
+export OS_CLOUD=admin
 openstack project create --domain default --description "OpenStack Services Project" service
 ----
 
