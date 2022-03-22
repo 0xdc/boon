@@ -811,18 +811,35 @@ tokens to radosgw and ceph will check with the keystone server if they are valid
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre><code><div class="highlight"><pre><span></span><span class="n">openstack</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">name</span><span class="o">=</span><span class="n">radosgw</span><span class="w"> </span><span class="se">\</span><span class="w"></span>
-<span class="w">        </span><span class="o">--</span><span class="n">description</span><span class="o">=</span><span class="s">&quot;Swift Service&quot;</span><span class="w"> </span><span class="se">\</span><span class="w"></span>
-<span class="w">        </span><span class="n">object</span><span class="o">-</span><span class="n">store</span><span class="w"></span>
+<pre><code><div class="highlight"><pre><span></span>openstack service create --name=radosgw \
+        --description=&quot;Swift Service&quot; \
+        object-store
 
-<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">swift</span><span class="w"> </span><span class="n">public</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
-<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">swift</span><span class="w"> </span><span class="n">admin</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
-<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">swift</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
-
-<span class="n">openstack</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="n">ceph</span><span class="o">-</span><span class="n">radosgw</span><span class="w"> </span><span class="o">--</span><span class="n">password</span><span class="w"> </span><span class="o">&lt;</span><span class="n">password</span><span class="o">&gt;</span><span class="w"></span>
-<span class="n">openstack</span><span class="w"> </span><span class="n">role</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="o">--</span><span class="n">project</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="o">--</span><span class="n">user</span><span class="w"> </span><span class="n">ceph</span><span class="o">-</span><span class="n">radosgw</span><span class="w"> </span><span class="n">admin</span><span class="w"></span>
+openstack user create ceph-radosgw --password &lt;password&gt;
+openstack role add --project service --user ceph-radosgw admin
 </pre></div></code></pre>
 </div></div>
+<div class="sect2">
+<h3 id="_tenant_specific_urls">Tenant specific URLs</h3>
+<div class="paragraph"><p>If your ceph.conf contains <code>rgw swift account in url = true</code>, object-store endpoints must include the suffix <code>/v1/AUTH_%(project_id)s</code>.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code><div class="highlight"><pre><span></span><span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">radosgw</span><span class="w"> </span><span class="n">public</span><span class="w"> </span><span class="p">&#39;</span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1/AUTH_%(project_id)s&#39;</span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">radosgw</span><span class="w"> </span><span class="n">admin</span><span class="w"> </span><span class="p">&#39;</span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1/AUTH_%(project_id)s&#39;</span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">radosgw</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="p">&#39;</span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1/AUTH_%(project_id)s&#39;</span>
+</pre></div></code></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_non_specific_urls">Non-specific URLs</h3>
+<div class="listingblock">
+<div class="content">
+<pre><code><div class="highlight"><pre><span></span><span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">radosgw</span><span class="w"> </span><span class="n">public</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">radosgw</span><span class="w"> </span><span class="n">admin</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
+<span class="n">openstack</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="o">--</span><span class="n">region</span><span class="w"> </span><span class="n">RegionOne</span><span class="w"> </span><span class="n">radosgw</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//radosgw:8080/swift/v1</span>
+</pre></div></code></pre>
+</div></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -847,7 +864,7 @@ tokens to radosgw and ceph will check with the keystone server if they are valid
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-03-17 18:15:16 UTC
+ 2022-03-22 13:30:12 UTC
 </div>
 </div>
 </body>

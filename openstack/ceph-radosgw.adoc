@@ -11,12 +11,24 @@ openstack service create --name=radosgw \
 	--description="Swift Service" \
 	object-store
 
-openstack endpoint create --region RegionOne swift public http://radosgw:8080/swift/v1
-openstack endpoint create --region RegionOne swift admin http://radosgw:8080/swift/v1
-openstack endpoint create --region RegionOne swift internal http://radosgw:8080/swift/v1
-
 openstack user create ceph-radosgw --password <password>
 openstack role add --project service --user ceph-radosgw admin
+----
+
+=== Tenant specific URLs
+If your ceph.conf contains `rgw swift account in url = true`, object-store endpoints must include the suffix `/v1/AUTH_%(project_id)s`.
+
+----
+openstack endpoint create --region RegionOne radosgw public 'http://radosgw:8080/swift/v1/AUTH_%(project_id)s'
+openstack endpoint create --region RegionOne radosgw admin 'http://radosgw:8080/swift/v1/AUTH_%(project_id)s'
+openstack endpoint create --region RegionOne radosgw internal 'http://radosgw:8080/swift/v1/AUTH_%(project_id)s'
+----
+
+=== Non-specific URLs
+----
+openstack endpoint create --region RegionOne radosgw public http://radosgw:8080/swift/v1
+openstack endpoint create --region RegionOne radosgw admin http://radosgw:8080/swift/v1
+openstack endpoint create --region RegionOne radosgw internal http://radosgw:8080/swift/v1
 ----
 
 
